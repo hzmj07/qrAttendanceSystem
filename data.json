@@ -1,14 +1,7 @@
 {
-  "attends": [
-    {
-      "studentId": "236711001020",
-      "name": "ABDUL AZIZ",
-      "surname": "EL 0MER",
-      "department": "ITL",
-      "time": "2026-02-18T22:07:50.946Z"
-    }
-  ],
+  "attends": []
+  ,
   "bannedIps": [
-    "::ffff:192.168.1.191"
+  
   ]
 }
