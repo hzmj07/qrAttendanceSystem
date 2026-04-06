@@ -8,18 +8,17 @@ export const IpBanProvider = ({ children }) => {
   const [bannedIps, setBannedIps] = useState([]);
   const [savedStudents, setSavedStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [API_URL, setLocalUrl] = useState("");
+  const [API_URL, setLocalUrl] = useState("http://192.168.1.36:5000");
 
-
-  // STATUS: checking | idle | searching | found | submitting | success
   const [status, setStatus] = useState("checking");
   const [isBanned, setIsBanned] = useState(false);
 
   // 🔹 İlk açılışta IP kontrolü
- useEffect(() => {
-  const host = window.location.hostname;
-  setLocalUrl(`http://${host}:3666`);
-}, []);
+//  useEffect(() => {
+
+  
+//   setLocalUrl(`http://192.168.1.36:5000`);
+// }, []);
 
 // api hazırsa ip kontrolü yap
 useEffect(() => {
@@ -30,8 +29,7 @@ useEffect(() => {
   const lessonStatus = async () => {
     try {
       const res = await fetch(`${API_URL}/lesson-status`);
-      const data = await res.json();   // 🔥 ASIL DATA
-
+      const data = await res.json();  
       console.log("dataaa" ,data);
       
       return data;
@@ -86,12 +84,12 @@ useEffect(() => {
     try {
       const res = await fetch(`${API_URL}/check-ip`);
       const data = await res.json();
-      console.log(data);
+      console.log("dataaa", data);
       
       setStatus(data.status)
     } catch (err) {
       console.error("IP check error:", err);
-      setStatus("idle");
+      setStatus("error");
     }
   };
 

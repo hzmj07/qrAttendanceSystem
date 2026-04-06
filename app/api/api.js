@@ -1,5 +1,5 @@
 const startClassApi = async (studentList) => {
-  const res = await fetch("http://192.168.1.119:3666/start-lesson", {
+  const res = await fetch("http://localhost:5000/start-lesson", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

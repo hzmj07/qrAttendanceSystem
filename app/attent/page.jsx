@@ -11,40 +11,47 @@ import {
   IdCard,
 } from "lucide-react";
 
-const ACADEMIC_DATABASE = require("../../students.json");
-
 export default function StudentAttendanceForm() {
-  const { doAttendance, isBanned, status, setStatus } = useIpBan();
+  const { doAttendance, isBanned, status, setStatus, checkMyIpStatus } = useIpBan();
   const [studentId, setStudentId] = useState("");
   const [foundStudent, setFoundStudent] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const isIdComplete = studentId.length === 12;
+  const isIdComplete = studentId.length === 7;
 
   useEffect(() => {
-    if (isIdComplete) {
+    checkMyIpStatus();
+  }, []);
+
+  useEffect(() => {
+    if (isIdComplete && status !== "no-lesson" && status !== "checking") {
       searchStudent();
-    } else {
+    } else if (!isIdComplete) {
       setFoundStudent(null);
       setErrorMessage("");
-      if(status !== "checking") setStatus("idle");
+      if (status !== "checking") setStatus("idle");
     }
   }, [studentId]);
 
-  const searchStudent = () => {
-    setStatus("searching");
-    const student = ACADEMIC_DATABASE.find((s) => s.studentId === studentId);
-
-    setTimeout(() => { // محاكاة بسيطة للبحث لإعطاء شعور بالاحترافية
-      if (student) {
-        setFoundStudent(student);
-        setStatus("found");
-      } else {
-        setFoundStudent(null);
-        setErrorMessage("لم يتم العثور على طالب بهذا الرقم الجامعي.");
-        setStatus("idle");
+  const searchStudent = async () => {
+    try {
+      setStatus("searching");
+      setErrorMessage("");
+      
+      const response = await fetch(`http://192.168.1.36:5000/student/${studentId}`);
+      
+      if (!response.ok) {
+        throw new Error("Student not found");
       }
-    }, 400);
+      
+      const student = await response.json();
+      setFoundStudent(student);
+      setErrorMessage("");
+    } catch (err) {
+      setFoundStudent(null);
+      setErrorMessage("الطالب غير مسجل في قاعدة البيانات");
+      setStatus("idle");
+    }
   };
 
   const confirmAttendance = async () => {
@@ -65,10 +72,11 @@ export default function StudentAttendanceForm() {
 
   const handleIdChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
-    if (value.length <= 12) setStudentId(value);
+    if (value.length <= 7) {
+      setStudentId(value);
+    }
   };
 
-  /* --------- UI COMPONENTS ---------- */
 
   if (status === "checking") {
     return (
@@ -84,33 +92,6 @@ export default function StudentAttendanceForm() {
     );
   }
 
-  if (status === "success" || status === "banned") {
-    return (
-      <Center>
-        <div className="bg-white p-8 rounded-3xl shadow-2xl border border-green-100 flex flex-col items-center scale-110 transition-all">
-          <div className="bg-green-100 p-4 rounded-full mb-4">
-            <CheckCircle2 size={48} className="text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">تم التسجيل بنجاح</h2>
-          <p className="text-gray-500">شكراً لك، نتمنى لك يوماً دراسياً ممتعاً</p>
-        </div>
-      </Center>
-    );
-  }
-
- if (status == "no-lesson") {
-    return (
-      <Center>
-        <div className="bg-white p-8 rounded-3xl shadow-2xl border border-yellow-100 flex flex-col items-center scale-110 transition-all">
-          <div className="bg-yellow-100 p-4 rounded-full mb-4">
-            <AlertCircle size={48} className="text-yellow-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">لم يتم إنشاء درس </h2>
-          <p className="text-gray-500">يرجى الانتظار حتى يتم إنشاء درس جديد</p>
-        </div>
-      </Center>
-    );
-  }
   if (status === "banned") {
     return (
       <Center>
@@ -120,6 +101,34 @@ export default function StudentAttendanceForm() {
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">تم حظرك</h2>
           <p className="text-gray-500">يرجى الاتصال بالإدارة إذا كنت تعتقد أن هذا خطأ</p>
+        </div>
+      </Center>
+    );
+  }
+
+  if (status === "no-lesson") {
+    return (
+      <Center>
+        <div className="bg-white p-8 rounded-3xl shadow-2xl border border-yellow-100 flex flex-col items-center scale-110 transition-all">
+          <div className="bg-yellow-100 p-4 rounded-full mb-4">
+            <AlertCircle size={48} className="text-yellow-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">لم يتم إنشاء درس</h2>
+          <p className="text-gray-500">يرجى الانتظار حتى يتم إنشاء درس جديد</p>
+        </div>
+      </Center>
+    );
+  }
+
+  if (status === "success") {
+    return (
+      <Center>
+        <div className="bg-white p-8 rounded-3xl shadow-2xl border border-green-100 flex flex-col items-center scale-110 transition-all">
+          <div className="bg-green-100 p-4 rounded-full mb-4">
+            <CheckCircle2 size={48} className="text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">تم التسجيل بنجاح</h2>
+          <p className="text-gray-500">شكراً لك، نتمنى لك يوماً دراسياً ممتعاً</p>
         </div>
       </Center>
     );
@@ -141,23 +150,28 @@ export default function StudentAttendanceForm() {
           <div className="relative group">
             <label className="block text-sm font-bold text-black mb-2 mr-1">الرقم الجامعي</label>
             <input
+              type="text"
               value={studentId}
               onChange={handleIdChange}
-              placeholder="000000000000"
+              placeholder="0000000"
+              maxLength="7"
               className={`w-full text-black text-center text-2xl font-mono tracking-[0.2em] border-2 p-4 rounded-2xl outline-none transition-all
                 ${isIdComplete ? 'border-indigo-500 bg-indigo-50/30' : 'border-gray-100 focus:border-indigo-300'}
               `}
             />
+            <div className="text-xs text-gray-400 mt-2 text-center">{studentId.length}/7</div>
           </div>
 
           {/* Feedback Area */}
           <div className="mt-8 min-h-[160px] flex flex-col justify-center">
-            {status === "searching" ? (
-               <div className="flex flex-col items-center gap-2 text-indigo-500">
-                  <Loader2 className="animate-spin" />
-                  <span className="text-sm">جارٍ البحث في قاعدة البيانات...</span>
-               </div>
-            ) : foundStudent ? (
+            {status === "searching" && (
+              <div className="flex flex-col items-center gap-2 text-indigo-500">
+                <Loader2 className="animate-spin" size={32} />
+                <span className="text-sm font-medium">جارٍ البحث في قاعدة البيانات...</span>
+              </div>
+            )}
+
+            {foundStudent && status !== "searching" && (
               <div className="animate-in fade-in zoom-in duration-300">
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-4 flex items-center gap-4">
                   <div className="bg-white p-3 rounded-xl shadow-sm">
@@ -165,28 +179,39 @@ export default function StudentAttendanceForm() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">الطالب المُسجل</p>
-                    <p className="text-lg font-bold text-gray-800">{foundStudent.name} {foundStudent.surname}</p>
+                    <p className="text-lg font-bold text-gray-800">
+                      {foundStudent.name} {foundStudent.surname}
+                    </p>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={confirmAttendance}
                   disabled={status === "submitting"}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  {status === "submitting" ? <Loader2 className="animate-spin" /> : "تأكيد تسجيل الحضور"}
+                  {status === "submitting" ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      <span>جارٍ التسجيل...</span>
+                    </>
+                  ) : (
+                    "تأكيد تسجيل الحضور"
+                  )}
                 </button>
               </div>
-            ) : (
-              <div className="text-center space-y-3 text-black ">
+            )}
+
+            {!foundStudent && status !== "searching" && (
+              <div className="text-center space-y-3 text-black">
                 {!errorMessage ? (
                   <div className="opacity-40">
                     <Search className="mx-auto mb-2" size={40} />
-                    <p className="text-sm">بانتظار إكمال الرقم (12 خانة)</p>
+                    <p className="text-sm font-medium">أدخل رقمك الجامعي (7 أرقام)</p>
                   </div>
                 ) : (
                   <div className="bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 animate-shake">
-                    <AlertCircle className="mx-auto mb-2" />
+                    <AlertCircle className="mx-auto mb-2" size={28} />
                     <p className="text-sm font-medium">{errorMessage}</p>
                   </div>
                 )}
@@ -194,7 +219,7 @@ export default function StudentAttendanceForm() {
             )}
           </div>
         </div>
-        
+
         <p className="text-center text-gray-400 text-xs mt-8">
           جميع الحقوق محفوظة &copy; {new Date().getFullYear()} - النظام الأكاديمي
         </p>
@@ -204,7 +229,7 @@ export default function StudentAttendanceForm() {
 }
 
 const Center = ({ children }) => (
-  <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-    <div className="text-center">{children}</div>
+  <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 p-6">
+    <div>{children}</div>
   </div>
 );
