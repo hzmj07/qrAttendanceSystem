@@ -37,6 +37,7 @@ export default function StudentAttendanceForm() {
     try {
       setStatus("searching");
       setErrorMessage("");
+      console.log("testt" , studentId);
       
       const response = await fetch(`http://192.168.1.36:5000/student/${studentId}`);
       
@@ -45,7 +46,10 @@ export default function StudentAttendanceForm() {
       }
       
       const student = await response.json();
+      console.log(student);
+      
       setFoundStudent(student);
+      setStatus("idle");
       setErrorMessage("");
     } catch (err) {
       setFoundStudent(null);
@@ -93,14 +97,14 @@ export default function StudentAttendanceForm() {
   }
 
   if (status === "banned") {
-    return (
+ return (
       <Center>
-        <div className="bg-white p-8 rounded-3xl shadow-2xl border border-red-100 flex flex-col items-center scale-110 transition-all">
-          <div className="bg-red-100 p-4 rounded-full mb-4">
-            <AlertCircle size={48} className="text-red-600" />
+        <div className="bg-white p-8 rounded-3xl shadow-2xl border border-green-100 flex flex-col items-center scale-110 transition-all">
+          <div className="bg-green-100 p-4 rounded-full mb-4">
+            <CheckCircle2 size={48} className="text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">تم حظرك</h2>
-          <p className="text-gray-500">يرجى الاتصال بالإدارة إذا كنت تعتقد أن هذا خطأ</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">تم التسجيل بنجاح</h2>
+          <p className="text-gray-500">شكراً لك، نتمنى لك يوماً دراسياً ممتعاً</p>
         </div>
       </Center>
     );
