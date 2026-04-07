@@ -138,7 +138,7 @@ export default function StudentAttendanceForm() {
     );
   }
   return (
-    <div className="flex min-h-screen items-center justify-center  from-slate-50 to-indigo-50 p-6" dir="rtl">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 p-6" dir="rtl">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -150,7 +150,6 @@ export default function StudentAttendanceForm() {
         </div>
 
         <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/60 border border-white relative overflow-hidden">
-          {/* Input Section */}
           <div className="relative group">
             <label className="block text-sm font-bold text-black mb-2 mr-1">الرقم الجامعي</label>
             <input
@@ -167,7 +166,7 @@ export default function StudentAttendanceForm() {
           </div>
 
           {/* Feedback Area */}
-          <div className="mt-8  flex flex-col justify-center">
+          <div className="mt-8 min-h-[160px] flex flex-col justify-center">
             {status === "searching" && (
               <div className="flex flex-col items-center gap-2 text-indigo-500">
                 <Loader2 className="animate-spin" size={32} />
