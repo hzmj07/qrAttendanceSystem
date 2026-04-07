@@ -1,5 +1,63 @@
 # 🚀 Quick Start Guide - QR Attendance System
 
+## 🌐 Local Network Architecture / معمارية الشبكة المحلية
+
+هذا النظام **مصمم خصيصاً للعمل على الشبكة المحلية (LAN)** وليس على الإنترنت العام.
+
+This system is **specifically designed to work on Local Networks (LAN)** and not on the public internet.
+
+```
+┌─────────────────────────────────────────────────────┐
+│           Local Network / الشبكة المحلية             │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│     ┌──────────────────┐                          │
+│     │  Server PC       │  Port 5000               │
+│     │  (192.168.x.x)   │  Port 3000               │
+│     └────────┬─────────┘                          │
+│              │                                    │
+│    ┌─────────┴──────────┬────────────┐            │
+│    │                    │            │            │
+│    ▼                    ▼            ▼            │
+│ [Admin]           [Student 1]    [Student 2]     │
+│ (WiFi/Ethernet)   (Mobile)       (Mobile)        │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**المميزات / Features:**
+- ✅ جميع الأجهزة على نفس الشبكة / All devices on same network
+- ✅ اتصال فوري / Instant connection
+- ✅ لا يحتاج إنترنت خارجي / No external internet needed
+- ✅ آمن وخاص / Secure and private
+- ❌ لا يعمل عبر الإنترنت / Does NOT work over internet
+
+---
+## ⚡ المتطلبات الأساسية (Basic Requirements)
+
+**BEFORE STARTING - قبل البدء:**
+
+```
+✅ نفس WiFi / Same WiFi
+   كل الأجهزة (المسؤول + الطلاب) على نفس شبكة WiFi
+   All devices (admin + students) on same WiFi network
+
+✅ جهاز واحد لتشغيل الخادم / One device for Server
+   يبقى مشغل طول الوقت / Must stay running
+
+✅ عنوان IP صحيح / Correct IP Address
+   اكتشف IP المحلي: ipconfig (Windows)
+   Find local IP: ipconfig (Windows) / ifconfig (Mac)
+
+✅ اتصال مباشر / Direct Connection
+   لا تحتاج إنترنت عام - بس شبكة محلية
+   No external internet - just local network
+```
+
+**هذا النظام مصمم حصرياً للشبكات المحلية LAN فقط**
+**This system is designed EXCLUSIVELY for Local Networks (LAN) only**
+
+---
 ## للبدء السريع (Arabic Quick Start)
 
 ### الخطوات الأساسية:
@@ -166,11 +224,27 @@ node qr-backend/server.js
 
 ## 🌐 عناوين IP المهمة (Important IPs)
 
+**هذا النظام مصمم للشبكة المحلية فقط**
+**This system is designed for Local Network ONLY**
+
 ```
-Local Network:
+Local Network IP Setup:
 - Find your IP: ipconfig (Windows) or ifconfig (Mac/Linux)
 - Update in context.jsx:
   const API_URL = "http://YOUR_IP:5000"
+
+مثال / Example:
+- Server IP: 192.168.1.50
+- Frontend URL: http://192.168.1.50:3000
+- Backend URL: http://192.168.1.50:5000
+
+⚠️ ملاحظات هامة / Important Notes:
+✅ جميع الأجهزة يجب أن تكون على نفس WiFi
+✅ All devices must be on same WiFi
+✅ لا يعمل من خارج الشبكة المحلية
+✅ Does NOT work outside the local network
+✅ الاتصال يجب أن يكون مباشر (بدون VPN أو Proxy)
+✅ Connection must be direct (no VPN or Proxy)
 ```
 
 ---

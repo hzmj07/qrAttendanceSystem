@@ -23,13 +23,48 @@
 
 ---
 
+## � Local Network Architecture
+
+### ⚡ Core Design:
+This system is **specifically and exclusively designed to work on Local Networks (LAN)**. It is NOT designed for public internet deployment.
+
+```
+Use Case: Educational institutions, schools, universities
+Scope: Single local network (WiFi/Ethernet)
+Connection: Instant and secure without intermediaries
+Requirement: All devices on the same network
+```
+
+### 🔧 How It Works:
+
+1. **Server**
+   - Runs on a single computer (typically admin desk)
+   - Listens on port 5000: `http://192.168.x.x:5000`
+   - Stores data locally (JSON files)
+   - Only accessible to devices on the same network
+
+2. **Frontend**
+   - Runs on the same server or any device on the network
+   - Development port 3000: `http://192.168.x.x:3000`
+   - Connects via local IP address
+   - Does NOT require continuous internet connection
+
+3. **Student Devices**
+   - Only requirement: Connection to same WiFi
+   - Access from any device (mobile, tablet, computer)
+   - Scan QR code or enter student ID
+   - Instant and secure connection
+
+---
+
 ## 🎯 Overview
 
 An intelligent attendance management system based on:
 - **QR Codes**: Simplified attendance registration
-- **Local Network Distribution**: Works across connected devices
+- **Local Network Distribution**: Works across connected devices on the same LAN
 - **Bilingual Interface**: Full Arabic and English support (RTL)
 - **IP Ban System**: Prevents duplicate attendance registration
+- **Local Network Architecture**: Secure and private design without internet dependency
 
 ### Usage Scenario:
 
@@ -45,7 +80,62 @@ Administrator              Students
 
 ---
 
-## 📦 Requirements & Setup
+## 🌐 Local Network Requirements
+
+### Core Requirements:
+
+#### 1. **Same Network/WiFi**
+```
+✅ All devices must be on the same local network
+✅ Same SSID (WiFi)
+✅ Same Router/Switch
+❌ Cannot work over public internet
+❌ Cannot work from outside the school
+```
+
+#### 2. **Local IP Address**
+```bash
+# Each device has a local IP:
+- 192.168.1.x (common range)
+- 192.168.x.x
+- 10.0.0.x
+
+# Example:
+- Server (Admin): 192.168.1.50
+- Student 1: 192.168.1.100 (mobile)
+- Student 2: 192.168.1.101 (mobile)
+```
+
+#### 3. **Direct Connection**
+```
+NO need for:
+- VPN
+- Proxy
+- Port Forwarding
+- External DNS
+
+Only:
+- Direct connection between devices on same network
+```
+
+### Advantages:
+
+✅ **Fast** - No latency
+✅ **Secure** - Data never leaves the network
+✅ **Reliable** - No dependency on external internet
+✅ **Private** - No one outside can access data
+✅ **Efficient** - Very low bandwidth consumption
+
+### Limitations:
+
+❌ **Classroom only** - Works within single network scope
+❌ **No internet dependency** - Doesn't work if main internet is down
+❌ **Inside only** - Cannot access from outside the network
+❌ **Single device** - Server must stay running
+
+---
+
+
 
 ### System Requirements:
 - Node.js v18+
@@ -633,6 +723,45 @@ Excel file:
 ---
 
 ## 🐛 Troubleshooting
+
+### 🔴 Local Network Issues
+
+#### Issue: Cannot access server from another device
+```
+Common Causes:
+1. Devices on different WiFi networks
+2. Wrong IP address
+3. Firewall blocking connection
+4. Server not running
+
+Solution:
+✅ Step 1: Verify same WiFi network
+   - All devices on same SSID:
+   Windows: ipconfig /all (look for SSID)
+   Mac/Linux: networksetup -listallnetworkservices
+
+✅ Step 2: Find correct server IP
+   Windows PowerShell:
+   ipconfig
+   (Look for IPv4 Address under WiFi)
+   
+✅ Step 3: Update IP in files
+   context.jsx:
+   const API_URL = "http://192.168.1.XX:5000"
+   (Replace XX with your number)
+   
+✅ Step 4: Test connection
+   From other device: http://192.168.1.XX:5000/lesson-status
+```
+
+#### Issue: "Cannot connect to server" from student device
+```
+Solution:
+1. Verify student device is on same WiFi
+2. Verify correct IP in context.jsx
+3. Verify server is running: node server.js
+4. Try: ping 192.168.1.XX (from student device)
+```
 
 ### Issue: "Cannot connect to server"
 ```
